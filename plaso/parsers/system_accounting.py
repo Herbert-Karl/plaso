@@ -5,9 +5,47 @@ import math
 import os
 import re
 
+from plaso.containers import events
 from plaso.lib import errors
 from plaso.parsers import interface
 from plaso.parsers import manager
+
+class OpenBSDSystemAccountingEventData(events.EventData):
+  """event data containing the data from system accounting struct on OpenBSD
+  
+  TODO: switch to built in data types
+  Attributes:
+    command_name (str): name of the file that was run in the process.
+    user_time (str): time spent in user mode for the process.
+    system_time (str): time spent in system mode for the process.
+    elapsed_time (str): total time spent running the process.
+    count_io_blocks (float): ....
+    starting_time (str): timestamp when the process was started.
+    uid (int): user id that was associated with the process.
+    gid (int): group id that was associated with the process.
+    average_memory_usage (int): ....
+    tty (int): tty that controlled the process or -1.
+    pid (int): process id that was associated with the process.
+    flags (str): translated accounting flag values recorded for the process.
+  """
+  
+  DATA_TYPE = 'openbsd:system_accounting:struct'
+
+  def __init__(self):
+    """Initializes event data."""
+    super(OpenBSDSystemAccountingEventData, self).__init__(data_type=self.DATA_TYPE)
+    self.command_name = None
+    self.user_time = None
+    self.system_time = None
+    self.elapsed_time = None
+    self.count_io_blocks = None
+    self.starting_time = None
+    self.uid = None
+    self.gid = None
+    self.average_memory_usage = None
+    self.tty = None
+    self.pid = None
+    self.flags = None
 
 class OpenBSDSystemAccountingParser(interface.FileObjectParser):
   """Parser for system accounting files created on OpenBSD."""
@@ -89,7 +127,6 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
     _STRUCT_SIZE = struct.calcsize(self._STRUCT_FORMAT)
     try:
         with open(file_path, 'rb') as file: # Opening the file in binary mode
-            accounting_structs = []
             while True:
                 encoded_data = file.read(_STRUCT_SIZE)
                 if not encoded_data:
@@ -106,7 +143,19 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
                 count_io_blocks = convert_comp_t(count_io_blocks)
                 flags = parse_flags(flags)
                 # result
-                accounting_structs.append({'starting_time':starting_time, 'command_name':command_name, 'pid':process_id, 'uid':user_id, 'gid':group_id, 'tty':controlling_tty, 'user_time':user_time, 'system_time':system_time, 'elapsed_time':elapsed_time, 'average_memory_usage':avg_mem_usage, 'count_io_blocks':count_io_blocks, 'flags':flags})
-            return accounting_structs
+                event_data = OpenBSDSystemAccountingEventData()
+                event_data.command_name = command_name
+                event_data.user_time = user_time
+                event_data.system_time = system_time
+                event_data.elapsed_time = elapsed_time
+                event_data.count_io_blocks = count_io_blocks
+                event_data.starting_time = starting_time
+                event_data.uid = user_id
+                event_data.gid = group_id
+                event_data.average_memory_usage = avg_mem_usage
+                event_data.tty = controlling_tty
+                event_data.pid = process_id
+                event_data.flags = flags
+                parser_mediator.ProduceEventData(event_data)
 
 manager.ParsersManager.RegisterParser(OpenBSDSystemAccountingParser)
