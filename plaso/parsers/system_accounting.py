@@ -86,5 +86,27 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
     file_object.seek(0, os.SEEK_SET)
     
     # TODO: logic!
+    _STRUCT_SIZE = struct.calcsize(self._STRUCT_FORMAT)
+    try:
+        with open(file_path, 'rb') as file: # Opening the file in binary mode
+            accounting_structs = []
+            while True:
+                encoded_data = file.read(_STRUCT_SIZE)
+                if not encoded_data:
+                    break
+                # decode data 
+                decoded_data = struct.unpack(struct_format, encoded_data)
+                command_name, user_time, system_time, elapsed_time, count_io_blocks, starting_time, user_id, group_id, avg_mem_usage, controlling_tty, process_id, flags = decoded_data
+                # further decoding of values
+                command_name = command_name.split(b'\x00')[0].decode(self._TEXT_ENCODING)
+                starting_time = datetime.datetime.utcfromtimestamp(starting_time).isoformat() + 'Z' # the value for starting_time stored with accounting is calculated from nanoboottime() (meaning the UTC timestamp that the system got booted) and the process associated value from nanouptime() at process start (meaning time elapsed since system boot) - the resulting timestamp, which we are parsing here, should be UTC based then
+                user_time = time_conversion(convert_comp_t(user_time))
+                system_time = time_conversion(convert_comp_t(system_time))
+                elapsed_time = time_conversion(convert_comp_t(elapsed_time))
+                count_io_blocks = convert_comp_t(count_io_blocks)
+                flags = parse_flags(flags)
+                # result
+                accounting_structs.append({'starting_time':starting_time, 'command_name':command_name, 'pid':process_id, 'uid':user_id, 'gid':group_id, 'tty':controlling_tty, 'user_time':user_time, 'system_time':system_time, 'elapsed_time':elapsed_time, 'average_memory_usage':avg_mem_usage, 'count_io_blocks':count_io_blocks, 'flags':flags})
+            return accounting_structs
 
 manager.ParsersManager.RegisterParser(OpenBSDSystemAccountingParser)
