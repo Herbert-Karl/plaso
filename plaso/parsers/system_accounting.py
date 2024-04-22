@@ -38,29 +38,31 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
 
   # based on https://man.openbsd.org/acct.5
   _STRUCT_FORMAT = '24sHHHHQIIIiII' # see https://docs.python.org/3/library/struct.html#format-characters for meaning
+  
+  _TEXT_ENCODING = 'iso-8859-1'
 
-  def _Convert_comp_t(comp_t):
+  def _Convert_comp_t(self, comp_t):
     """converts the type comp_t used in multiple places in the data structure to the actual units"""
     converted_t = comp_t & 0x1fff  # hex 0x1fff is equivalent to octal 017777 from the referenced C code
     comp_t >>= 13
     while comp_t:
         comp_t -= 1
         converted_t <<= 3
-    converted_t = converted_t / _AHZ # "unit" conversion
+    converted_t = converted_t / self._AHZ # "unit" conversion
     return converted_t 
 
-  def _TimeConverstion(total_secs):
+  def _TimeConverstion(self, total_secs):
     """Helper function to format execution times as a nice string"""
-    hours = total_secs / _SECSPERHOUR
-    minutes = math.fmod(total_secs, _SECSPERHOUR) / _SECSPERMIN
-    seconds = math.fmod(total_secs, _SECSPERMIN)
+    hours = total_secs / self._SECSPERHOUR
+    minutes = math.fmod(total_secs, self._SECSPERHOUR) / self._SECSPERMIN
+    seconds = math.fmod(total_secs, self._SECSPERMIN)
     time_string = f"{hours:02.0f}:{minutes:02.0f}:{seconds:05.2f}"
     return time_string
 
-  def _ParseStructFlags(flags_value):
+  def _ParseStructFlags(self, flags_value):
     """Helper function to convert the flag values of a struct into somewhat readable names"""
     set_flags = []
-    for flag_bit, description in _ACCOUNTING_FLAGS.items():
+    for flag_bit, description in self._ACCOUNTING_FLAGS.items():
         if flags_value & flag_bit:
             set_flags.append(description)
     flags_string = ', '.join(set_flags)
