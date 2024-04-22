@@ -36,6 +36,7 @@ from plaso.parsers import spotlight_storedb
 from plaso.parsers import sqlite
 from plaso.parsers import symantec
 from plaso.parsers import systemd_journal
+from plaso.parsers import system_accounting
 from plaso.parsers import text_parser
 from plaso.parsers import trendmicroav
 from plaso.parsers import unified_logging
