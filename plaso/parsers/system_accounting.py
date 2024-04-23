@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """Parser system accounting files on OpenBSD."""
 
+import datetime
 import math
 import os
 import re
+import struct
 
 from plaso.containers import events
 from plaso.lib import errors
@@ -124,37 +126,35 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
     file_object.seek(0, os.SEEK_SET)
     
     _STRUCT_SIZE = struct.calcsize(self._STRUCT_FORMAT)
-    try:
-        with open(file_path, 'rb') as file: # Opening the file in binary mode
-            while True:
-                encoded_data = file.read(_STRUCT_SIZE)
-                if not encoded_data:
-                    break
-                # decode data 
-                decoded_data = struct.unpack(struct_format, encoded_data)
-                command_name, user_time, system_time, elapsed_time, count_io_blocks, starting_time, user_id, group_id, avg_mem_usage, controlling_tty, process_id, flags = decoded_data
-                # further decoding of values
-                command_name = command_name.split(b'\x00')[0].decode(self._TEXT_ENCODING)
-                starting_time = datetime.datetime.utcfromtimestamp(starting_time).isoformat() + 'Z' # the value for starting_time stored with accounting is calculated from nanoboottime() (meaning the UTC timestamp that the system got booted) and the process associated value from nanouptime() at process start (meaning time elapsed since system boot) - the resulting timestamp, which we are parsing here, should be UTC based then
-                user_time = time_conversion(convert_comp_t(user_time))
-                system_time = time_conversion(convert_comp_t(system_time))
-                elapsed_time = time_conversion(convert_comp_t(elapsed_time))
-                count_io_blocks = convert_comp_t(count_io_blocks)
-                flags = parse_flags(flags)
-                # result
-                event_data = OpenBSDSystemAccountingEventData()
-                event_data.command_name = command_name
-                event_data.user_time = user_time
-                event_data.system_time = system_time
-                event_data.elapsed_time = elapsed_time
-                event_data.count_io_blocks = count_io_blocks
-                event_data.starting_time = starting_time
-                event_data.uid = user_id
-                event_data.gid = group_id
-                event_data.average_memory_usage = avg_mem_usage
-                event_data.tty = controlling_tty
-                event_data.pid = process_id
-                event_data.flags = flags
-                parser_mediator.ProduceEventData(event_data)
+    while True:
+      encoded_data = file_object.read(_STRUCT_SIZE)
+      if not encoded_data:
+        break
+      # decode data 
+      decoded_data = struct.unpack(self._STRUCT_FORMAT, encoded_data)
+      command_name, user_time, system_time, elapsed_time, count_io_blocks, starting_time, user_id, group_id, avg_mem_usage, controlling_tty, process_id, flags = decoded_data
+      # further decoding of values
+      command_name = command_name.split(b'\x00')[0].decode(self._TEXT_ENCODING)
+      starting_time = datetime.datetime.utcfromtimestamp(starting_time).isoformat() + 'Z' # the value for starting_time stored with accounting is calculated from nanoboottime() (meaning the UTC timestamp that the system got booted) and the process associated value from nanouptime() at process start (meaning time elapsed since system boot) - the resulting timestamp, which we are parsing here, should be UTC based then
+      user_time = self._TimeConverstion(self._Convert_comp_t(user_time))
+      system_time = self._TimeConverstion(self._Convert_comp_t(system_time))
+      elapsed_time = self._TimeConverstion(self._Convert_comp_t(elapsed_time))
+      count_io_blocks = self._Convert_comp_t(count_io_blocks)
+      flags = self._ParseStructFlags(flags)
+      # result
+      event_data = OpenBSDSystemAccountingEventData()
+      event_data.command_name = command_name
+      event_data.user_time = user_time
+      event_data.system_time = system_time
+      event_data.elapsed_time = elapsed_time
+      event_data.count_io_blocks = count_io_blocks
+      event_data.starting_time = starting_time
+      event_data.uid = user_id
+      event_data.gid = group_id
+      event_data.average_memory_usage = avg_mem_usage
+      event_data.tty = controlling_tty
+      event_data.pid = process_id
+      event_data.flags = flags
+      parser_mediator.ProduceEventData(event_data)
 
 manager.ParsersManager.RegisterParser(OpenBSDSystemAccountingParser)

@@ -4,7 +4,6 @@
 
 import unittest
 
-from plaso.lib import definitions
 from plaso.parsers import system_accounting
 
 from tests.parsers import test_lib
