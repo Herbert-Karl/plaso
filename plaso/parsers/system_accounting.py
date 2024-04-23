@@ -123,7 +123,6 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
     
     file_object.seek(0, os.SEEK_SET)
     
-    # TODO: logic!
     _STRUCT_SIZE = struct.calcsize(self._STRUCT_FORMAT)
     try:
         with open(file_path, 'rb') as file: # Opening the file in binary mode
