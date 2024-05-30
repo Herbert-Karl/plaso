@@ -31,6 +31,7 @@ class OpenBSDSystemAccountingParserTest(test_lib.ParserTestCase):
     # content check
     expected_event_values = {
         'data_type': 'openbsd:system_accounting:struct',
+        'index': 2,
         'command_name': 'ls',
         'user_time': '00:00:00.00', 
         'system_time': '00:00:00.00', 

@@ -17,6 +17,7 @@ class OpenBSDSystemAccountingEventData(events.EventData):
   
   TODO: switch to built in data types
   Attributes:
+    index (int): position of the entry in the system accounting file
     command_name (str): name of the file that was run in the process.
     user_time (str): time spent in user mode for the process.
     system_time (str): time spent in system mode for the process.
@@ -36,6 +37,7 @@ class OpenBSDSystemAccountingEventData(events.EventData):
   def __init__(self):
     """Initializes event data."""
     super(OpenBSDSystemAccountingEventData, self).__init__(data_type=self.DATA_TYPE)
+    self.index = None
     self.command_name = None
     self.user_time = None
     self.system_time = None
@@ -126,6 +128,8 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
     file_object.seek(0, os.SEEK_SET)
     
     _STRUCT_SIZE = struct.calcsize(self._STRUCT_FORMAT)
+    
+    pos = 1
     while True:
       encoded_data = file_object.read(_STRUCT_SIZE)
       if not encoded_data:
@@ -143,6 +147,7 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
       flags = self._ParseStructFlags(flags)
       # result
       event_data = OpenBSDSystemAccountingEventData()
+      event_data.index = pos
       event_data.command_name = command_name
       event_data.user_time = user_time
       event_data.system_time = system_time
@@ -156,5 +161,6 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
       event_data.pid = process_id
       event_data.flags = flags
       parser_mediator.ProduceEventData(event_data)
+      pos = pos + 1
 
 manager.ParsersManager.RegisterParser(OpenBSDSystemAccountingParser)
