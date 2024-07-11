@@ -988,6 +988,12 @@ attribute_mappings:
   description: 'Document Last Save Time'
 place_holder_event: true
 ---
+data_type: 'openbsd:system_accounting:entry'
+attribute_mappings:
+- name: 'start_time'
+  description: 'Start Time'
+place_holder_event: false
+---
 data_type: 'openxml:metadata'
 attribute_mappings:
 - name: 'creation_time'
