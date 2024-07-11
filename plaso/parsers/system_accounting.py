@@ -32,7 +32,7 @@ class OpenBSDSystemAccountingEventData(events.EventData):
     flags (str): translated accounting flag values recorded for the process.
   """
   
-  DATA_TYPE = 'openbsd:system_accounting:struct'
+  DATA_TYPE = 'openbsd:system_accounting:entry'
 
   def __init__(self):
     """Initializes event data."""
