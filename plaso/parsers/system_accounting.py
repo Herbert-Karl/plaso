@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """Parser system accounting files on OpenBSD."""
 
-import datetime
 import math
 import os
 import re
 import struct
+
+from dfdatetime import posix_time as dfdatetime_posix_time
 
 from plaso.containers import events
 from plaso.lib import errors
@@ -23,7 +24,7 @@ class OpenBSDSystemAccountingEventData(events.EventData):
     system_time (str): time spent in system mode for the process.
     elapsed_time (str): total time spent running the process.
     count_io_blocks (float): ....
-    starting_time (str): timestamp when the process was started.
+    starting_time (dfdatetime.DateTimeValues): date and time when the process was started.
     uid (int): user id that was associated with the process.
     gid (int): group id that was associated with the process.
     average_memory_usage (int): ....
@@ -139,7 +140,7 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
       command_name, user_time, system_time, elapsed_time, count_io_blocks, starting_time, user_id, group_id, avg_mem_usage, controlling_tty, process_id, flags = decoded_data
       # further decoding of values
       command_name = command_name.split(b'\x00')[0].decode(self._TEXT_ENCODING)
-      starting_time = datetime.datetime.utcfromtimestamp(starting_time).isoformat() + 'Z' # the value for starting_time stored with accounting is calculated from nanoboottime() (meaning the UTC timestamp that the system got booted) and the process associated value from nanouptime() at process start (meaning time elapsed since system boot) - the resulting timestamp, which we are parsing here, should be UTC based then
+      starting_time = dfdatetime_posix_time.PosixTime(timestamp=starting_time,time_zone_offset=None) # the value for starting_time stored with accounting is calculated from nanoboottime() (meaning the UTC timestamp that the system got booted) and the process associated value from nanouptime() at process start (meaning time elapsed since system boot) - the resulting timestamp, which we are parsing here, should be UTC based then
       user_time = self._TimeConverstion(self._Convert_comp_t(user_time))
       system_time = self._TimeConverstion(self._Convert_comp_t(system_time))
       elapsed_time = self._TimeConverstion(self._Convert_comp_t(elapsed_time))

@@ -37,7 +37,7 @@ class OpenBSDSystemAccountingParserTest(test_lib.ParserTestCase):
         'system_time': '00:00:00.00', 
         'elapsed_time': '00:00:00.00', 
         'count_io_blocks': 0.0, 
-        'starting_time': '2024-04-22T05:18:06Z',
+        'starting_time': '2024-04-22T05:18:06+00:00',
         'uid': 0, 
         'gid': 0, 
         'average_memory_usage': 0, 
