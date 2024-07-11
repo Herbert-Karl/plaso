@@ -24,7 +24,7 @@ class OpenBSDSystemAccountingEventData(events.EventData):
     system_time (str): time spent in system mode for the process.
     elapsed_time (str): total time spent running the process.
     count_io_blocks (float): ....
-    starting_time (dfdatetime.DateTimeValues): date and time when the process was started.
+    start_time (dfdatetime.DateTimeValues): date and time when the process was started.
     uid (int): user id that was associated with the process.
     gid (int): group id that was associated with the process.
     average_memory_usage (int): ....
@@ -44,7 +44,7 @@ class OpenBSDSystemAccountingEventData(events.EventData):
     self.system_time = None
     self.elapsed_time = None
     self.count_io_blocks = None
-    self.starting_time = None
+    self.start_time = None
     self.uid = None
     self.gid = None
     self.average_memory_usage = None
@@ -137,10 +137,10 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
         break
       # decode data 
       decoded_data = struct.unpack(self._STRUCT_FORMAT, encoded_data)
-      command_name, user_time, system_time, elapsed_time, count_io_blocks, starting_time, user_id, group_id, avg_mem_usage, controlling_tty, process_id, flags = decoded_data
+      command_name, user_time, system_time, elapsed_time, count_io_blocks, start_time, user_id, group_id, avg_mem_usage, controlling_tty, process_id, flags = decoded_data
       # further decoding of values
       command_name = command_name.split(b'\x00')[0].decode(self._TEXT_ENCODING)
-      starting_time = dfdatetime_posix_time.PosixTime(timestamp=starting_time,time_zone_offset=None) # the value for starting_time stored with accounting is calculated from nanoboottime() (meaning the UTC timestamp that the system got booted) and the process associated value from nanouptime() at process start (meaning time elapsed since system boot) - the resulting timestamp, which we are parsing here, should be UTC based then
+      start_time = dfdatetime_posix_time.PosixTime(timestamp=start_time,time_zone_offset=None) # the value for start_time stored with accounting is calculated from nanoboottime() (meaning the UTC timestamp that the system got booted) and the process associated value from nanouptime() at process start (meaning time elapsed since system boot) - the resulting timestamp, which we are parsing here, should be UTC based then
       user_time = self._TimeConverstion(self._Convert_comp_t(user_time))
       system_time = self._TimeConverstion(self._Convert_comp_t(system_time))
       elapsed_time = self._TimeConverstion(self._Convert_comp_t(elapsed_time))
@@ -154,7 +154,7 @@ class OpenBSDSystemAccountingParser(interface.FileObjectParser):
       event_data.system_time = system_time
       event_data.elapsed_time = elapsed_time
       event_data.count_io_blocks = count_io_blocks
-      event_data.starting_time = starting_time
+      event_data.start_time = start_time
       event_data.uid = user_id
       event_data.gid = group_id
       event_data.average_memory_usage = avg_mem_usage
