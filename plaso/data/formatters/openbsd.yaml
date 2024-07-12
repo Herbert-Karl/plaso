@@ -1,0 +1,25 @@
+# Plaso OpenBSD related event formatters.
+---
+type: 'conditional'
+data_type: 'openbsd:system_accounting:entry'
+message:
+- 'Proc: {command_name}'
+- 'Started: {start_time}'
+- 'UID: {uid}'
+- 'GID: {gid}'
+- 'PID: {pid}'
+- 'User Time of Process: {user_time}'
+- 'System Time of Process: {system_time}'
+- 'Elapsed Process Time: {elapsed_time}'
+- 'IO activity: {count_io_blocks}'
+- 'Average Memory Usage: {average_memory_usage}'
+- 'TTY: {tty}'
+- 'Flags: {flags}'
+- 'Index: {index}'
+short_message:
+- 'Proc: {command_name}'
+- 'Started: {start_time}'
+- 'UID: {uid}'
+- 'GID: {gid}'
+source: 'System Accounting'
+short_source: 'LOG'
