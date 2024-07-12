@@ -4,7 +4,6 @@ type: 'conditional'
 data_type: 'openbsd:system_accounting:entry'
 message:
 - 'Proc: {command_name}'
-- 'Started: {start_time}'
 - 'UID: {uid}'
 - 'GID: {gid}'
 - 'PID: {pid}'
@@ -18,7 +17,6 @@ message:
 - 'Index: {index}'
 short_message:
 - 'Proc: {command_name}'
-- 'Started: {start_time}'
 - 'UID: {uid}'
 - 'GID: {gid}'
 source: 'System Accounting'
