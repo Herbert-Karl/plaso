@@ -44,7 +44,10 @@ class DetermineOperatingSystemPlugin(
             location_separator='\\'),
         file_system_searcher.FindSpec(
             case_sensitive=False, location='\\WTSRV\\System32',
-            location_separator='\\')]
+            location_separator='\\'),
+        file_system_searcher.FindSpec(
+            case_sensitive=False, location='/etc/signify',
+            location_separator='/')]
 
   # pylint: disable=unused-argument
   def Collect(self, mediator, artifact_definition, searcher, file_system):
@@ -73,6 +76,9 @@ class DetermineOperatingSystemPlugin(
 
     elif '/system/library' in locations:
       operating_system = definitions.OPERATING_SYSTEM_FAMILY_MACOS
+
+    elif '/etc/signify' in locations:
+      operating_system = definitions.OPERATING_SYSTEM_FAMILY_OPENBSD
 
     elif '/etc' in locations:
       operating_system = definitions.OPERATING_SYSTEM_FAMILY_LINUX
