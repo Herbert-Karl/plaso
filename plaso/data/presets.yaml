@@ -203,3 +203,11 @@ parsers:
 - esedb
 - mft
 - winxp
+---
+name: openbsd
+description: Preset for OpenBSD. Defers to the preset for Linux instead of restating all possibly relevant parsers for Linux/Unix.
+operating_systems:
+- {family: OpenBSD}
+parsers:
+- openbsd_system_accounting
+- linux
