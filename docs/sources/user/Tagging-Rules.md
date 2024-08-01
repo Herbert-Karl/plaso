@@ -27,6 +27,16 @@ Mar 11 00:00:00 ubuntu2015 CRON[3]: (root) CMD (touch /tmp/afile.txt)
 
 ### login_failed
 
+### useradd
+
+### groupadd
+
+### userdel
+
+### groupdel
+
+### firewall_change
+
 ### logout
 
 ### session_start
