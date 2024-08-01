@@ -1,0 +1,48 @@
+# Tags OpenBSD application execution events.
+application_execution
+  data_type is 'openbsd:system_accounting:entry'
+  data_type is 'bash:history:entry'
+  data_type is 'docker:layer:configuration'
+  data_type is 'fish:history:entry'
+  data_type is 'shell:zsh:history'
+  data_type is 'syslog:cron:task_run'
+  reporter is 'sudo' AND body contains 'COMMAND='
+  reporter is 'CROND' AND body contains 'CMD'
+
+# User added.
+useradd
+  reporter is 'useradd' AND body contains 'new user'
+
+# Group added.
+groupadd
+  reporter is 'useradd' AND body contains 'new group'
+  reporter is 'groupadd'
+
+# User removed.
+userdel
+  reporter is 'userdel' AND body contains 'user removed'
+
+# Group removed.
+groupdel
+  reporter is 'groupdel'
+
+# Package installed.
+application_install
+  reporter is 'pkg_add' AND body contains 'Added'
+
+# Tags OpenBSD system boot events.
+boot
+  reporter is '/bsd' AND body contains 'OpenBSD '
+# if wtmp files on OpenBSD are also parsed, this tag could be extended by an entry of "reboot"
+
+# Tags OpenBSD log-in events.
+login
+  reporter is 'login' AND (body contains 'logged in' OR body contains 'ROOT LOGIN' OR body contains 'session opened')
+  reporter is 'sshd' AND (body contains 'session opened' OR body contains 'Starting session')
+# when wtmp files on OpenBSD are also parsed, this tag should be extended
+
+# Tags OpenBSD log-out events.
+logout
+  reporter is 'login' AND body contains 'session closed'
+  reporter is 'sshd' AND (body contains 'session closed' OR body contains 'Close session')
+# when wtmp files on OpenBSD are also parsed, this tag should be extended

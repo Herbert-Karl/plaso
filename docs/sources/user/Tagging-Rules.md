@@ -123,3 +123,24 @@ The sections below provide more context regarding specific tagging rules.
 
 ### firewall_change
 
+## OpenBSD tagging rules
+
+The OpenBSD tagging rules are stored in the file: [tag_linux.txt](https://github.com/log2timeline/plaso/blob/main/plaso/data/tag_openbsd.txt)
+
+### application_execution
+
+### useradd
+
+### groupadd
+
+### userdel
+
+### groupdel
+
+### application_install
+
+### boot
+
+### login
+
+### logout
